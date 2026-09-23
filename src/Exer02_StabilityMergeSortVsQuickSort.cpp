@@ -21,33 +21,93 @@ class Solution {
 private:
     void merge(vector<string>& v, int left, int mid, int right)
     {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
 
+        vector<string> L(n1);
+        vector<string> R(n2);
+
+        for (int i = 0; i < n1; i++) L[i] = v[left + i];
+        for (int j = 0; j < n2; j++) R[j] = v[mid + 1 + j];
+
+        int i = 0, j = 0, k = left;
+
+        while (i < n1 && j < n2)
+        {
+            // >= prefere a palavra que já estava à esquerda
+            if (L[i].length() >= R[j].length())
+            {
+                v[k++] = L[i++];
+            }
+
+            else
+            {
+                v[k++] = R[j++];
+            }
+        }
+
+        while (i < n1)
+        {
+            v[k++] = L[i++];
+        }
+
+        while (j < n2)
+        {
+            v[k++] = R[j++];
+        }
     }
 
     void mergeSortHelper(vector<string>& v, int left, int right)
     {
+        if (left < right)
+        {
+            int mid = left + (right - left) / 2;
 
+            mergeSortHelper(v, left, mid);
+            mergeSortHelper(v, mid + 1, right);
+            merge(v, left, mid, right);
+        }
     }
 
     int partition(vector<string>& v, int left, int right)
     {
+        string pivot = v[right];
+        int i = left - 1;
 
+        for (int j = left; j < right; j++)
+        {
+            if (v[j].length() >= pivot.length())
+            {
+                i++;
+                swap(v[i], v[j]);
+            }
+        }
+
+        swap(v[i + 1], v[right]);
+        return i + 1;
     }
 
     void quickSortHelper(vector<string>& v, int left, int right)
     {
-
+        if (left < right)
+        {
+            int pi = partition(v, left, right);
+            quickSortHelper(v, left, pi - 1);
+            quickSortHelper(v, pi + 1, right);
+        }
     }
 
 public:
     vector<string> mergeSort(vector<string> v)
     {
-
+        mergeSortHelper(v, 0, v.size() - 1);
+        return v;
     }
 
     vector<string> quickSort(vector<string> v)
     {
-
+        quickSortHelper(v, 0, v.size() - 1);
+        return v;
     }
 };
 

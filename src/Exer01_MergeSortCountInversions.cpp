@@ -23,18 +23,88 @@ private:
     // Função auxiliar que intercala (merge) duas metades e conta as inversões
     ll mergeAndCount(vector<int>& v, int left, int mid, int right)
     {
+        int n1 = mid - left + 1;
+        int n2 = right - mid;
 
+        vector<int> L(n1);
+        vector<int> R(n2);
+
+        for (int i = 0; i < n1; i++)
+        {
+            L[i] = v[left + i];
+        }
+
+        for (int j = 0; j < n2; j++)
+        {
+            R[j] = v[mid + 1 + j];
+        }
+
+        int i = 0;
+        int j = 0;
+        int k = left;
+        ll inv_count = 0;
+
+        while (i < n1 && j < n2)
+        {
+            if (L[i] <= R[j])
+            {
+                v[k++] = L[i++];
+            }
+
+            else
+            {
+                v[k++] = R[j++];
+                inv_count += (n1 - i);
+            }
+        }
+
+        while (i < n1)
+        {
+            v[k++] = L[i++];
+        }
+
+        while (j < n2)
+        {
+            v[k++] = R[j++];
+        }
+
+        return inv_count;
     }
 
     ll mergeSortAndCount(vector<int>& v, int left, int right)
     {
+        ll inv_count = 0;
 
+        if (left < right)
+        {
+            int mid = left + (right - left) / 2;
+
+            // Inversões na metade esquerda
+            inv_count += mergeSortAndCount(v, left, mid);
+
+            // Inversões na metade direita
+            inv_count += mergeSortAndCount(v, mid + 1, right);
+
+            // Inversões entre as duas metades
+            inv_count += mergeAndCount(v, left, mid, right);
+        }
+
+        return inv_count;
     }
 
 public:
     pair<vector<int>, ll> countInversions(vector<int> v)
     {
+        int n = v.size();
 
+        ll inversions = 0;
+
+        if (n > 0)
+        {
+            inversions = mergeSortAndCount(v, 0, n - 1);
+        }
+
+        return {v, inversions};
     }
 };
 

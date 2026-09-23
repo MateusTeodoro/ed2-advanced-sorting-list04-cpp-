@@ -17,33 +17,118 @@ class Solution {
 private:
     int parityPartition(vector<int>& v)
     {
+        int left = 0;
+        int right = v.size() - 1;
 
+        while (true)
+        {
+            // O ponteiro da esquerda avança enquanto ver números PARES
+            while (left < v.size() && v[left] % 2 == 0)
+            {
+                left++;
+            }
+
+            // O ponteiro da direita retrocede enquanto ver números ÍMPARES
+            while (right >= 0 && v[right] % 2 != 0) {
+                right--;
+            }
+
+            // Se os ponteiros se cruzarem, o vetor está segregado
+            if (left >= right)
+            {
+                return left; // Retorna o índice exato onde começam os ímpares
+            }
+
+            // Se pararam, é porque encontraram um ímpar na esquerda e um par na direita. Trocam!
+            swap(v[left], v[right]);
+
+            // Após trocar, movem-se para a próxima casa para não ficarem travados
+            left++;
+            right--;
+        }
     }
 
     int partitionAsc(vector<int>& v, int left, int right)
     {
+        int pivot = v[left + (right - left) / 2];
+        int i = left - 1;
+        int j = right + 1;
 
+        while (true)
+        {
+            do { i++; } while (v[i] < pivot);
+            do { j--; } while (v[j] > pivot);
+
+            if (i >= j)
+            {
+                return j;
+            }
+
+            swap(v[i], v[j]);
+        }
     }
 
     void quickSortAsc(vector<int>& v, int left, int right)
     {
-
+        if (left < right)
+        {
+            int pi = partitionAsc(v, left, right);
+            quickSortAsc(v, left, pi);
+            quickSortAsc(v, pi + 1, right);
+        }
     }
 
     int partitionDesc(vector<int>& v, int left, int right)
     {
+        int pivot = v[left + (right - left) / 2];
+        int i = left - 1;
+        int j = right + 1;
 
+        while (true)
+        {
+            do { i++; } while (v[i] > pivot); // Inverte o sinal de < para >
+            do { j--; } while (v[j] < pivot); // Inverte o sinal de > para <
+
+            if (i >= j)
+            {
+                return j;
+            }
+
+            swap(v[i], v[j]);
+        }
     }
 
     void quickSortDesc(vector<int>& v, int left, int right)
     {
-
+        if (left < right)
+        {
+            int pi = partitionDesc(v, left, right);
+            quickSortDesc(v, left, pi);
+            quickSortDesc(v, pi + 1, right);
+        }
     }
 
 public:
     vector<int> sortEvenOdd(vector<int> v)
     {
+        if (v.empty()) return v;
 
+        // Isola todos os pares na esquerda e os ímpares na direita
+        int boundary = parityPartition(v);
+
+        // Ordena a metade dos pares em ordem crescente
+        if (boundary > 0)
+        {
+            quickSortAsc(v, 0, boundary - 1);
+        }
+
+        // Ordena a metade dos ímpares em ordem decrescente
+        if (boundary < v.size())
+        {
+            quickSortDesc(v, boundary, v.size() - 1);
+        }
+
+        return v;
     }
 };
 
